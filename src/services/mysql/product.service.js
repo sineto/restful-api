@@ -3,19 +3,12 @@ const init = (connection) => {
   const findImages = async (results) => {
     const conn = await connection;
     const productIds = results.map((product) => product.id).join(',');
-    const [ imageResults ] = await conn.query(`select * from images where product_id in (${productIds}) group by product_id`);
-
-    const images = imageResults.reduce((acc, next) => {
-      return {
-        ...acc,
-        [next.product_id]: next
-      };
-    }, {});
+    const [ imageResults ] = await conn.query(`select * from images where product_id in (${productIds})`);
 
     const products = results.map((product) => {
       return {
         ...product,
-        images: images[product.id]
+      images: imageResults.filter((img) => img.product_id === product.id)
       }
     });    
 
@@ -33,7 +26,7 @@ const init = (connection) => {
     return products;
   };
 
-  const findAllPaginated = async ({ limit = 10, offset = 0, orderBy = 'id', order = 'ASC' }) => {
+  const findAllPaginated = async ({ limit = 10, offset = 0, orderBy = 'id', order = 'ASC' } = {}) => {
     const conn = await connection;
     const [ result ] = await conn.query(`select * from products order by ${orderBy} ${order} limit ${limit * offset}, ${limit + 1}`)
     if (result.length === 0) {
@@ -56,6 +49,7 @@ const init = (connection) => {
   const findAllByCategory = async (categoryId) => {
     const conn = await connection;
     const [ result ] = await conn.query('select * from products where id in (select product_id from products_categories where category_id = ?)', [categoryId]);
+    console.log('result findbycateogry', result);
     if (result.length === 0) {
       throw new Error('No products found');
     }
@@ -86,7 +80,7 @@ const init = (connection) => {
     return findById(result.insertId);
   };
 
-  const createImage = async (productId, data) => {
+  const createImages = async (productId, data) => {
     const conn = await connection;
     const [ result ] = await conn.query('insert into images (description, url, product_id) values (?, ?, ?)', [ ...data, productId ]);
     if (result.length === 0) {
@@ -99,7 +93,7 @@ const init = (connection) => {
   const update = async (id, data) => {
     const conn = await connection;
     const [ result ] = await conn.query('update products set name = ?, price = ? where id = ?', [ ...data, id ]);
-    if (result.length === 0) {
+    if (result.affectedRows === 0) {
       throw new Error('Failed to update product');
     }
 
@@ -121,7 +115,8 @@ const init = (connection) => {
   const destroy = async (id) => {
     const conn = await connection;
     const [ result ] = await conn.query('delete from products where id = ?', [id]);
-    if (result.length === 0) {
+    console.log('result delete', result);
+    if (result.affectedRows === 0) {
       throw new Error('Failed to delete product');
     }
 
@@ -134,7 +129,7 @@ const init = (connection) => {
     findAllByCategory,
     findById,
     create,
-    createImage,
+    createImages,
     update,
     updateCategories,
     destroy,
