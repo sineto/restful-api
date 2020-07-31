@@ -1,9 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const router = require('./src/routers');
+
 const app = express();
 
 app.use(bodyParser.json());
+app.use(router);
 
 app.get('/', (req, res) => {
   res.send({ message: 'hello there!' });
