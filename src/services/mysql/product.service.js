@@ -53,6 +53,17 @@ const init = (connection) => {
     }
   };
 
+  const findAllByCategory = async (categoryId) => {
+    const conn = await connection;
+    const [ result ] = await conn.query('select * from products where id in (select product_id from products_categories where category_id = ?)', [categoryId]);
+    if (result.length === 0) {
+      throw new Error('No products found');
+    }
+
+    const products = await findImages(result);
+    return products;
+  };
+
   const findById = async (id) => {
     const conn = await connection;
     const [ result ] = await conn.query('select * from products where id = ?', [id]);
@@ -102,11 +113,9 @@ const init = (connection) => {
       throw new Error('Failed to update product categories');
     }
 
-    for await (const category of categoryIds)  {
-      await conn.query('insert into products_categories (product_id, category_id) values (?, ?)', [productId, category.id])
+    for await (const categoryId of categoryIds)  {
+      await conn.query('insert into products_categories (product_id, category_id) values (?, ?)', [productId, categoryId])
     }
-
-
   };
 
   const destroy = async (id) => {
@@ -122,10 +131,12 @@ const init = (connection) => {
   return {
     findAll,
     findAllPaginated,
+    findAllByCategory,
     findById,
     create,
     createImage,
     update,
+    updateCategories,
     destroy,
   };
 };
