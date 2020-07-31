@@ -1,11 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const errorHandler = require('./src/middlewares/error-handler');
 
 const router = require('./src/routers');
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(errorHandler);
 app.use(router);
 
 app.get('/', (req, res) => {
