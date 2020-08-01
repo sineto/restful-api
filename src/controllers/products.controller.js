@@ -12,7 +12,7 @@ const findAll = async (req, res, next) => {
       products = await Products.findAllPaginated({ limit, offset });
     }
 
-    res.status(200).send(products);
+    return res.status(200).send(products);
   } catch (error) {
     next(error);
   }
@@ -21,7 +21,7 @@ const findAll = async (req, res, next) => {
 const findById = async (req, res, next) => {
   try {
     const [ product ] = await Products.findById(req.params.id);
-    res.status(200).send({ product });
+    return res.status(200).send(product);
   } catch (error) {
     next(error); 
   }
@@ -31,7 +31,10 @@ const create = async (req, res, next) => {
   try {
     const { name, price } = req.body;
     const [ product ] = await Products.create([name, price]);
-    res.status(200).send({ product });
+    return res.status(201).send({ 
+      message: 'Product successfully created',
+      product 
+    });
   } catch (error) {
     next(error); 
   }
@@ -42,7 +45,10 @@ const createImages = async (req, res, next) => {
     const { description, url } = req.body;
     await Products.createImages(req.params.id ,[description, url]); 
     const product = await Products.findById(req.params.id);
-    res.status(200).send({ product });
+    return res.status(201).send({ 
+      message: `Images successfully added to product id ${req.params.id}`,
+      product 
+    });
   } catch (error) {
     next(error);
   }
@@ -52,7 +58,7 @@ const update = async (req, res, next) => {
   try {
     const { name, price } = req.body;
     const [ product ] = await Products.update(req.params.id, [name, price]);
-    res.status(200).send({ 
+    return res.status(200).send({ 
       message: 'Product successfully updated',
       product 
     });
@@ -64,7 +70,7 @@ const update = async (req, res, next) => {
 const destroy = async (req, res, next) => {
   try {
     await Products.destroy(req.params.id);
-    res.status(200).send({ message: 'Product successfully deleted' });
+    return res.status(200).send({ message: 'Product successfully deleted' });
   } catch (error) {
     next(error); 
   }

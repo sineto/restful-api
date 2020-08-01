@@ -1,3 +1,5 @@
+const newError = require('../../utils/new-error');
+
 const init = (connection) => {
 
   const findImages = async (results) => {
@@ -19,7 +21,7 @@ const init = (connection) => {
     const conn = await connection;
     const [ result ] = await conn.query(`select * from products order by ${orderBy} ${order}`);
     if (result.length === 0) {
-      throw new Error('No products found');
+      throw newError(404, 'Products not found');
     } 
 
     const products = await findImages(result);
@@ -30,7 +32,7 @@ const init = (connection) => {
     const conn = await connection;
     const [ result ] = await conn.query(`select * from products order by ${orderBy} ${order} limit ${limit * offset}, ${limit + 1}`)
     if (result.length === 0) {
-      throw new Error('No products found');
+      throw newError(404, 'Products not found');
     }
 
     const products = await findImages(result);
@@ -48,10 +50,10 @@ const init = (connection) => {
 
   const findAllByCategory = async (categoryId) => {
     const conn = await connection;
+
     const [ result ] = await conn.query('select * from products where id in (select product_id from products_categories where category_id = ?)', [categoryId]);
-    console.log('result findbycateogry', result);
     if (result.length === 0) {
-      throw new Error('No products found');
+      throw newError(404, 'Products not found');
     }
 
     const products = await findImages(result);
@@ -62,7 +64,7 @@ const init = (connection) => {
     const conn = await connection;
     const [ result ] = await conn.query('select * from products where id = ?', [id]);
     if (result.length === 0) {
-      throw new Error(`Failed to find product id ${id}`);
+      throw newError(404, 'Product not found');
     }
 
     const product = await findImages(result);
@@ -73,8 +75,8 @@ const init = (connection) => {
   const create = async (data) => {
     const conn = await connection;
     const [ result ] = await conn.query('insert into products (name, price) values (?, ?)', data);
-    if (result.length === 0) {
-      throw new Error('Failed to create a new product');
+    if (result.affectedRows === 0) {
+      throw newError(500, 'Failed to create new product');
     }
 
     return findById(result.insertId);
@@ -83,8 +85,8 @@ const init = (connection) => {
   const createImages = async (productId, data) => {
     const conn = await connection;
     const [ result ] = await conn.query('insert into images (description, url, product_id) values (?, ?, ?)', [ ...data, productId ]);
-    if (result.length === 0) {
-      throw new Error('Failed to create an image');
+    if (result.affectedRows === 0) {
+      newError(500, 'Failed to create image');
     }
 
     return result;
@@ -94,7 +96,7 @@ const init = (connection) => {
     const conn = await connection;
     const [ result ] = await conn.query('update products set name = ?, price = ? where id = ?', [ ...data, id ]);
     if (result.affectedRows === 0) {
-      throw new Error('Failed to update product');
+      throw newError(500, 'Failed to update product');
     }
 
     return findById(id);
@@ -103,8 +105,8 @@ const init = (connection) => {
   const updateCategories = async (productId, categoryIds) => {
     const conn = await connection;
     const [ result ] = await conn.query('delete from products_categories where product_id = ?', [productId]);
-    if (result.length === 0) {
-      throw new Error('Failed to update product categories');
+    if (result.affectedRows === 0) {
+      throw newError(500, 'Failed to delete product');
     }
 
     for await (const categoryId of categoryIds)  {
@@ -115,7 +117,6 @@ const init = (connection) => {
   const destroy = async (id) => {
     const conn = await connection;
     const [ result ] = await conn.query('delete from products where id = ?', [id]);
-    console.log('result delete', result);
     if (result.affectedRows === 0) {
       throw new Error('Failed to delete product');
     }
