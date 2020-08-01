@@ -90,7 +90,7 @@ A few things of what this API can do:
 - [x] Products CRUD
 - [x] Categories CRUD
 - [x] Add Images to products
-- [ ] Add Categories to products
+- [x] Add/Update Categories to products
 - [x] `OrdeBy` filter for Products
 - [x] Paginate filter with `limit` and `offset`for Products
 - [x] Custom error handling
