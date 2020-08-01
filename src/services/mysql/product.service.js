@@ -104,13 +104,15 @@ const init = (connection) => {
 
   const updateCategories = async (productId, categoryIds) => {
     const conn = await connection;
-    const [ result ] = await conn.query('delete from products_categories where product_id = ?', [productId]);
-    if (result.affectedRows === 0) {
-      throw newError(500, 'Failed to delete product');
-    }
-
-    for await (const categoryId of categoryIds)  {
-      await conn.query('insert into products_categories (product_id, category_id) values (?, ?)', [productId, categoryId])
+    try {
+      await conn.query('START TRANSACTION');
+      await conn.query('delete from products_categories where product_id = ?', [productId]);
+      for await (const categoryId of categoryIds)  {
+        await conn.query('insert into products_categories (product_id, category_id) values (?, ?)', [productId, categoryId])
+      }
+      await conn.query('COMMIT');  
+    } catch (error) {
+      throw newError(500, 'Transaction error');       
     }
   };
 

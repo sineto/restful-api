@@ -5,6 +5,7 @@ const {
   create, 
   createImages,
   update,
+  patch,
   destroy
 } = require('../controllers/products.controller');
 
@@ -15,6 +16,7 @@ router.get('/:id', findById);
 router.post('/', create);
 router.post('/:id/images', createImages);
 router.put('/:id', update);
+router.patch('/:id', patch);
 router.delete('/:id', destroy);
 
 module.exports = router;

@@ -1,6 +1,8 @@
 const db = require('../database/mysql.config');
 const Products = require('../services/mysql/product.service')(db);
 
+const newError = require('../utils/new-error');
+
 const findAll = async (req, res, next) => {
   try {
     const { limit, offset } = req.query;
@@ -67,6 +69,41 @@ const update = async (req, res, next) => {
   }
 };
 
+const patch = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, price, categories } = req.body;
+    const [ oldProd ] = await Products.findById(req.params.id);
+
+    if (!oldProd) {
+      throw newError(404, 'Product not found');
+    }
+
+    if (name) {
+      oldProd.name = name;
+    }
+
+    if (price) {
+      oldProd.price = price;
+    }
+
+    await Products.update(id, [oldProd.name, oldProd.price]);
+
+    if (categories) {
+      await Products.updateCategories(id, categories);
+    }
+
+    const [ product ] = await Products.findById(id);
+
+    return res.status(200).send({
+      message: 'Product successfully updated',
+      product
+    });
+  } catch (error) {
+    next(error); 
+  }
+};
+
 const destroy = async (req, res, next) => {
   try {
     await Products.destroy(req.params.id);
@@ -82,6 +119,7 @@ module.exports = {
   create,
   createImages,
   update,
+  patch,
   destroy,
 };
 
