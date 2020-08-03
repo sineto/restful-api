@@ -24,7 +24,7 @@ const findAll = async (req, res, next) => {
 
 const findById = async (req, res, next) => {
   try {
-    const [ product ] = await Products.findById(req.params.id);
+    const product = await Products.findById(req.params.id);
     return res.status(200).send(product);
   } catch (error) {
     next(error); 
@@ -34,7 +34,7 @@ const findById = async (req, res, next) => {
 const create = async (req, res, next) => {
   try {
     const { name, price } = req.body;
-    const [ product ] = await Products.create([name, price]);
+    const product = await Products.create([name, price]);
     return res.status(201).send({ 
       message: 'Product successfully created',
       product 
@@ -44,10 +44,10 @@ const create = async (req, res, next) => {
   }
 };
 
-const createImages = async (req, res, next) => {
+const createImage = async (req, res, next) => {
   try {
     const { description, url } = req.body;
-    await Products.createImages(req.params.id ,[description, url]); 
+    await Products.createImage(req.params.id ,[description, url]); 
     const product = await Products.findById(req.params.id);
     return res.status(201).send({ 
       message: `Images successfully added to product id ${req.params.id}`,
@@ -61,7 +61,7 @@ const createImages = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const { name, price } = req.body;
-    const [ product ] = await Products.update(req.params.id, [name, price]);
+    const product = await Products.update(req.params.id, [name, price]);
     return res.status(200).send({ 
       message: 'Product successfully updated',
       product 
@@ -75,7 +75,7 @@ const patch = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { name, price, categories } = req.body;
-    const [ oldProd ] = await Products.findById(req.params.id);
+    const oldProd = await Products.findById(req.params.id);
 
     if (!oldProd) {
       throw newError(404, 'Product not found');
@@ -95,7 +95,7 @@ const patch = async (req, res, next) => {
       await Products.updateCategories(id, categories);
     }
 
-    const [ product ] = await Products.findById(id);
+    const product = await Products.findById(id);
 
     return res.status(200).send({
       message: 'Product successfully updated',

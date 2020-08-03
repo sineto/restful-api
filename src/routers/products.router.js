@@ -3,7 +3,7 @@ const {
   findAll, 
   findById,
   create, 
-  createImages,
+  createImage,
   update,
   patch,
   destroy
@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', findAll);
 router.get('/:id', findById);
 router.post('/', create);
-router.post('/:id/images', createImages);
+router.post('/:id/images', createImage);
 router.put('/:id', update);
 router.patch('/:id', patch);
 router.delete('/:id', destroy);
