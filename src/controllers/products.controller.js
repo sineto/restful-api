@@ -1,5 +1,7 @@
-const db = require('../database/mysql.config');
-const Products = require('../services/mysql/product.service')(db);
+// const db = require('../database/mysql.config');
+// const Products = require('../services/mysql/product.service')(db);
+const db = require('../database/pg.config');
+const Products = require('../services/pg/product.service')(db);
 
 const newError = require('../utils/new-error');
 

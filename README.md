@@ -85,7 +85,7 @@ Descriptions about the database implementations.
 ## Features
 A few things of what this API can do:
 - [x] Connection with MySQL database service
-- [ ] Connection with PostgresSQL database service
+- [x] Connection with PostgresSQL database service
 - [ ] Connection with MongoDB database service
 - [x] Products CRUD
 - [x] Categories CRUD
