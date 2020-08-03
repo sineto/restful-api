@@ -69,7 +69,7 @@ const init = (connection) => {
 
     const product = await findImages(result);
 
-    return product;
+    return product[0];
   };
 
   const create = async (data) => {
@@ -79,10 +79,11 @@ const init = (connection) => {
       throw newError(500, 'Failed to create new product');
     }
 
-    return findById(result.insertId);
+    const product = await findById(result.insertId);
+    return product;
   };
 
-  const createImages = async (productId, data) => {
+  const createImage = async (productId, data) => {
     const conn = await connection;
     const [ result ] = await conn.query('insert into images (description, url, product_id) values (?, ?, ?)', [ ...data, productId ]);
     if (result.affectedRows === 0) {
@@ -94,12 +95,13 @@ const init = (connection) => {
 
   const update = async (id, data) => {
     const conn = await connection;
-    const [ result ] = await conn.query('update products set name = ?, price = ? where id = ?', [ ...data, id ]);
+    const result = await conn.query('update products set name = ?, price = ? where id = ?', [ ...data, id ]);
     if (result.affectedRows === 0) {
       throw newError(500, 'Failed to update product');
     }
 
-    return findById(id);
+    const product = await findById(id);
+    return product;
   };
 
   const updateCategories = async (productId, categoryIds) => {
@@ -132,7 +134,7 @@ const init = (connection) => {
     findAllByCategory,
     findById,
     create,
-    createImages,
+    createImage,
     update,
     updateCategories,
     destroy,
