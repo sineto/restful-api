@@ -1,6 +1,6 @@
 const init = (connection) => {
 
-  const findAll = async ({ orderBy = 'id', order = 'ASC'}) => {
+  const findAll = async ({ orderBy = 'id', order = 'ASC'} = {}) => {
     const conn = await connection;
     const [ result ] = await conn.query(`select * from categories order by ${orderBy} ${order}`);
     if (result.length === 0) {
@@ -17,7 +17,7 @@ const init = (connection) => {
       throw new Error(`Category id ${id} not found`);
     }
 
-    return category;
+    return category[0];
   };
 
   const create = async (data) => {
