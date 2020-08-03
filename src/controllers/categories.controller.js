@@ -1,5 +1,7 @@
-const db = require('../database/mysql.config');
-const Products = require('../services/mysql/category.service')(db);
+// const db = require('../database/mysql.config');
+// const Products = require('../services/mysql/category.service')(db);
+const db = require('../database/pg.config');
+const Products = require('../services/pg/category.service')(db);
 
 const findAll = async (req, res, next) => {
   try {
